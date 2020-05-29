@@ -1,4 +1,3 @@
-const goods = require('./mock/goods.json');
 module.exports = {
   configureWebpack: {
     resolve: {
@@ -10,13 +9,16 @@ module.exports = {
     }
   },
   devServer: {
-    open: true, // 配置自动启动浏览器
-    host: 'localhost',
-    port: '8080',
-    before(app) {
-      app.get('/goods', (req, res) => {
-        res.json(goods)
-      })
+    port: 8080,
+    proxy: {
+      '/apis': {
+        target: 'http://localhost:3000/', // 对应自己的接口
+        changeOrigin: true,
+        ws: true,
+        pathRewrite: {
+          '^/apis': '',
+        },
+      },
     },
-  }
+  },
 }

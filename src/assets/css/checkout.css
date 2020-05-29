@@ -331,6 +331,7 @@ html {
   -ms-flex-wrap: wrap;
   flex-wrap: wrap; }
 .cart-item-list .cart-item-title .item-name {
+  /* padding-left: 100px; */
   width: 100%;
   line-height: 76px;
   color: #000;
