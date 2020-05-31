@@ -8,8 +8,7 @@
       style="position: absolute; width: 0; height: 0; overflow: hidden;"
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
-      xmlns:xlink="http://www.w3.org/1999/xlink"
-    >
+      xmlns:xlink="http://www.w3.org/1999/xlink">
       <defs>
         <symbol id="icon-add" viewBox="0 0 32 32">
           <title>add2</title>
@@ -85,7 +84,7 @@
               </ul>
             </div>
             <ul class="cart-item-list">
-              <li v-for="(item,index) in cartList" :key="item.productId">
+              <li v-for="item in cartList" :key="item.productId">
                 <div class="cart-tab-1">
                   <div class="cart-item-check">
                     <a
@@ -107,7 +106,7 @@
                   </div>
                 </div>
                 <div class="cart-tab-2">
-                  <div class="item-price">{{item.salePrice}}</div>
+                  <div class="item-price">{{item.salePrice | currency('$')}}</div>
                 </div>
                 <div class="cart-tab-3">
                   <div class="item-quantity">
@@ -121,7 +120,7 @@
                   </div>
                 </div>
                 <div class="cart-tab-4">
-                  <div class="item-price-total">{{subtotal(index)}}</div>
+                  <div class="item-price-total">{{item.productNum * item.salePrice | currency('$')}}</div>
                 </div>
                 <div class="cart-tab-5">
                   <div class="cart-item-opration">
@@ -144,10 +143,9 @@
           <div class="cart-foot-inner">
             <div class="cart-foot-l">
               <div class="item-all-check">
-                <a href="javascipt:;">
+                <a href="javascipt:;" @click="selectAll">
                   <span
                     class="checkbox-btn item-check-btn"
-                    @click="selectAll"
                     :class="{'check':isSelectAll}"
                   >
                     <svg class="icon icon-ok">
@@ -161,7 +159,7 @@
             <div class="cart-foot-r">
               <div class="item-total">
                 Item total:
-                <span class="total-price">{{total}}</span>
+                <span class="total-price">{{total | currency('$')}}</span>
               </div>
               <div class="btn-wrap">
                 <a class="btn btn--red">Checkout</a>
@@ -187,12 +185,12 @@ import NavHeader from 'components/NavHeader'
 import NavFooter from 'components/NavFooter'
 import NavBread from 'components/NavBread'
 import Modal from 'components/Modal'
+import {currency} from'./../util/currency'
 export default {
   data() {
     return {
       modalConfirm: false,
       productId: '',
-      isSelectAll: false,
       cartList: []
     }
   },
@@ -207,20 +205,25 @@ export default {
       let total = 0;
       for (let item of this.cartList) {
         if (item.checked == 1) {
-          total += item.productNum * item.salePrice;
+          total += parseInt(item.productNum) * parseInt(item.salePrice);
         }
       }
       return total;
+    },
+    isSelectAll() {
+      var i = 0;
+      this.cartList.forEach((item) => {
+        if (item.checked == '1') {
+          i++
+        }
+      })
+      return i == this.cartList.length;
     }
   },
   mounted() {
     this.init();
   },
   methods: {
-    subtotal(index) {
-      let item = this.cartList[index];
-      return item.productNum * item.salePrice
-    },
     init() {
       this.axios.get("/apis/users/cartList").then((response) => {
         let res = response.data;
@@ -269,19 +272,23 @@ export default {
     },
 
     selectAll() {
-      for (let item of this.cartList) {
-        item.checked = this.isSelectAll ? 0 : 1;
-        this.axios.post('/apis/users/editCart', {
-          productId: item.productId,
-          productNum: item.productNum,
-          checked: item.checked,
-        }).then((response) => {
-          let res = response.data;
-          console.log(res);
-        })
-      }
-      this.isSelectAll = !this.isSelectAll;
+      var flag = !this.isSelectAll;
+      console.log(flag);
+      this.cartList.forEach((item) => {
+        item.checked = flag ? '1' : '0';
+      })
+      this.axios.post('/apis/users/checkallCart', {
+        checkAll: flag ? true : false
+      }).then((response) => {
+        let res = response.data;
+        if (res.status === 0) {
+          console.log('成功');
+        }
+      })
     }
+  },
+  filters: {
+    currency
   }
 }
 </script>

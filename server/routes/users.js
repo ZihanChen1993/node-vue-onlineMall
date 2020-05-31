@@ -118,12 +118,12 @@ router.post('/delCart', function (req, res, next) {
 })
 
 // 购物车修改
-router.post('/editCart', function (req, res, nect) {
+router.post('/editCart', function (req, res, next) {
   var userId = req.cookies.userId;
   var productId = req.body.productId;
   var productNum = req.body.productNum;
   var checked = req.body.checked;
-  User.update({ "userId": userId, "cartList.productId": productId }, { "cartList.$.productNum": productNum, "cartList.$.checked":checked }, function (err, doc) {
+  User.update({ "userId": userId, "cartList.productId": productId }, { "cartList.$.productNum": productNum, "cartList.$.checked": checked }, function (err, doc) {
     if (err) {
       res.json({
         status: '1',
@@ -139,5 +139,41 @@ router.post('/editCart', function (req, res, nect) {
     }
   })
 });
+
+router.post('/checkallCart', function (req, res, next) {
+  var userId = req.cookies.userId;
+  var checkAll = req.body.checkAll ? '1' : '0';
+  User.findOne({ userId: userId }, function (err, user) {
+    if (err) {
+      res.json({
+        status: '1',
+        msg: err.message,
+        result: ''
+      })
+    } else {
+      if (user) {
+        console.log(checkAll);
+        user.cartList.forEach((item) => {
+          item.checked = checkAll;
+        })
+        user.save(function (err1, doc) {
+          if (err1) {
+            res.json({
+              status: '1',
+              msg: err.message,
+              result: ''
+            })
+          } else {
+            res.json({
+              status: '0',
+              msg: '',
+              result: 'suc'
+            })
+          }
+        })
+      }
+    }
+  })
+})
 
 module.exports = router;
