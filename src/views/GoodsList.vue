@@ -25,16 +25,17 @@
               <dd>
                 <a
                   href="javascript:void(0)"
-                  :class="{'cur':priceChecked=='all'}"
-                  @click="priceChecked=='all'"
+                  @click="setPriceFilter('all')"
+                  v-bind:class="{'cur':priceChecked=='all'}"
                 >All</a>
               </dd>
-              <dd v-for="(price,index) in priceFilter" :key="index" @click="priceChecked= index">
+              <dd v-for="(item,index) in priceFilter" 
+              :key="item.productId">
                 <a
                   href="javascript:void(0)"
-                  v-bind:class="{'cur':priceChecked==index}"
                   @click="setPriceFilter(index)"
-                >{{price.startPrice}} - {{price.endPrice}}</a>
+                  v-bind:class="{'cur':priceChecked==index}"
+                >{{item.startPrice}} - {{item.endPrice}}</a>
               </dd>
             </dl>
           </div>
@@ -223,6 +224,7 @@ export default {
       }).then((res) => {
         if (res.data.status == 0) {
           this.mdShowCart = true;
+          this.$store.commit("updateCartCount", 1);
         } else {
           this.mdShow = true;
         }

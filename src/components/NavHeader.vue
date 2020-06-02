@@ -55,7 +55,7 @@
           >Login</a>
           <a href="javascript:void(0)" class="navbar-link" @click="logOut" v-else>Logout</a>
           <div class="navbar-cart-container">
-            <span class="navbar-cart-count"></span>
+            <span class="navbar-cart-count">{{cartCount}}</span>
             <a class="navbar-link navbar-cart-link" href="/cart">
               <svg class="navbar-cart-logo">
                 <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-cart" />
@@ -134,6 +134,7 @@ export default {
         let res = response.data;
         if (res.status == 0) {
           this.nickName = res.result;
+          this.getCartCount();
         }
       });
     },
@@ -151,6 +152,7 @@ export default {
           this.errorTip = false;
           this.loginModalFlag = false;
           this.nickName = res.result.userName
+          this.getCartCount();
           //To-do
         } else {
           this.errorTip = true;
@@ -164,6 +166,18 @@ export default {
           this.nickName = '';
         }
       })
+    },
+    getCartCount() {
+      this.axios.get("/apis/users/getCartCount").then((response) => {
+        let res = response.data;
+        console.log(res);
+        this.$store.commit("initCartCount", res.result)
+      })
+    }
+  },
+  computed: {
+    cartCount(){
+      return this.$store.state.cartCount;
     }
   }
 }

@@ -14,7 +14,14 @@ var userSchema = new Schema({
     "checked": String,
     "productNum":String
   }],
-  "addressList": Array
+  "addressList": [{
+    "addressId": String,
+    "userName": String,
+    "streetName": String,
+    "postCode": Number,
+    "tel": Number,
+    "isDefault": Boolean
+  }]
 });
 
 // good 自动和数据库中goods关联

@@ -106,7 +106,7 @@
                   </div>
                 </div>
                 <div class="cart-tab-2">
-                  <div class="item-price">{{item.salePrice | currency('$')}}</div>
+                  <div class="item-price">{{item.salePrice | currency('￥')}}</div>
                 </div>
                 <div class="cart-tab-3">
                   <div class="item-quantity">
@@ -120,14 +120,14 @@
                   </div>
                 </div>
                 <div class="cart-tab-4">
-                  <div class="item-price-total">{{item.productNum * item.salePrice | currency('$')}}</div>
+                  <div class="item-price-total">{{item.productNum * item.salePrice | currency('￥')}}</div>
                 </div>
                 <div class="cart-tab-5">
                   <div class="cart-item-opration">
                     <a
                       href="javascript:;"
                       class="item-edit-btn"
-                      @click="delCartConfirm(item.productId)"
+                      @click="delCartConfirm(item)"
                     >
                       <svg class="icon icon-del">
                         <use xlink:href="#icon-del" />
@@ -159,10 +159,10 @@
             <div class="cart-foot-r">
               <div class="item-total">
                 Item total:
-                <span class="total-price">{{total | currency('$')}}</span>
+                <span class="total-price">{{total | currency('￥')}}</span>
               </div>
-              <div class="btn-wrap">
-                <a class="btn btn--red">Checkout</a>
+              <div class="btn-wrap" @click="checkOut">
+                <a class="btn btn--red" :class="{'btn--dis': checkoutCount === 0}">Checkout</a>
               </div>
             </div>
           </div>
@@ -190,7 +190,7 @@ export default {
   data() {
     return {
       modalConfirm: false,
-      productId: '',
+      delItem: '',
       cartList: []
     }
   },
@@ -209,6 +209,15 @@ export default {
         }
       }
       return total;
+    },
+    checkoutCount() {
+      var count = 0;
+      this.cartList.forEach((item) => {
+        if(item.checked == '1') {
+          count++;
+        }
+      });
+      return count;
     },
     isSelectAll() {
       var i = 0;
@@ -230,19 +239,20 @@ export default {
         this.cartList = res.result;
       })
     },
-    delCartConfirm(productId) {
-      this.productId = productId;
+    delCartConfirm(item) {
+      this.delItem = item;
       this.modalConfirm = true;
     },
     deleteCart() {
       // TO-DO
       this.axios.post('/apis/users/delCart', {
-        productId: this.productId
+        productId: this.delItem.productId
       }).then((response) => {
         let res = response.data;
         if (res.status === '0') {
           this.modalConfirm = false;
-          this.init()
+          this.init();
+          this.$store.commit("updateCartCount", -this.delItem.productNum);
         }
       })
     },
@@ -252,8 +262,10 @@ export default {
           return;
         }
         item.productNum--;
+        this.$store.commit("updateCartCount", -1);
       } else if (flag == 'add') {
         item.productNum++;
+        this.$store.commit("updateCartCount", 1);
       } else {
         item.checked = item.checked == 1 ? 0 : 1;
       }
@@ -285,6 +297,13 @@ export default {
           console.log('成功');
         }
       })
+    },
+    checkOut() {
+      if(this.checkoutCount > 0) {
+        this.$router.push({
+          path:'/address'
+        })
+      }
     }
   },
   filters: {
