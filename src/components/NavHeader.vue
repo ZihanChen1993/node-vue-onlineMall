@@ -42,6 +42,7 @@
         <a href="/">
           <img class="navbar-brand-logo" src="/img/logo1.png" />
         </a>
+        <h1 class="shopName">Grocery Store</h1>
       </div>
       <div class="navbar-right-container" style="display: flex;">
         <div class="navbar-menu-container">
@@ -176,7 +177,7 @@ export default {
     }
   },
   computed: {
-    cartCount(){
+    cartCount() {
       return this.$store.state.cartCount;
     }
   }
@@ -184,6 +185,7 @@ export default {
 </script>
 
 <style>
+
 .header {
   width: 100%;
   background-color: white;
@@ -205,6 +207,11 @@ export default {
   justify-content: flex-start;
   align-items: center;
   margin-left: -20px;
+}
+.navbar-left-container .shopName {
+  padding-left: 20px;
+  font-family:"moderat", sans-serif;
+  color: #d1434a;
 }
 .navbar-brand-logo {
   /*width: 120px;*/

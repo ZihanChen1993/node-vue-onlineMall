@@ -6,7 +6,7 @@ var User = require('./../models/user');
 
 
 
-mongoose.connect('mongodb://root:123456@127.0.0.1:27017/dumall', { useNewUrlParser: true });
+mongoose.connect('mongodb://root:123456@localhost:27017/dumall', { useNewUrlParser: true,useUnifiedTopology: true });
 
 mongoose.connection.on("connected", function () {
   console.log('MongoDB connected success');
